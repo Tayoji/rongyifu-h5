@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>易码收银</title>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react.min.js"></script>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react-dom.min.js"></script>
+    <script src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+</head>
+<body>
+
+<script src="../js/reg.js" type="text/babel"></script>
+<link rel="stylesheet" type="text/css" href="../css/reg.css" />
+<div id="reg-controller"></div>
+
+
+<script type="text/babel">
+    ReactDOM.render(
+      <Reg />,
+        document.getElementById('reg-controller')
+    );
+</script>
+</body>
+</html>
