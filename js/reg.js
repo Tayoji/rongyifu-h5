@@ -4,8 +4,8 @@
 
 var Reg = React.createClass({
     render:function () {
-        return (<p className="ssss">
-            ssssssss
-        </p>);
+        return (<div>
+
+        </div>);
     }
 })
