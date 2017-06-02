@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>上传图片</title>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react.min.js"></script>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react-dom.min.js"></script>
+    <script src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.1/style/weui.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.min.css">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="../css/uploadimg.css"/>
+
+</head>
+<body>
+<div id="upload_img"></div>
+<script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
+<script type="text/babel">
+
+    var UploadImg = React.createClass({
+        getInitialState: function () {
+            return {
+                imgs: [
+                    {img: '../src/upload_face.png', title: '信息所在面'},
+                    {img: '../src/upload_back.png', title: '信息所在面'},
+                    {img: '../src/upload_face1.png', title: '信息所在面'},
+                    {img: '../src/upload_bank.png', title: '信息所在面'},
+                ]
+            }
+        },
+        componentDidMount: function () {
+
+        },
+        handleClickImg: function (index, obj) {
+            console.log(obj.target.result)
+            for (var i = 0, numFiles = obj.target.files.length; i < numFiles; i++) {
+                var file = obj.target.files[i];
+                var img = document.createElement('img');
+                var reader = new FileReader();
+                reader.onload = this.getOnloadFunc(img,index);
+                reader.readAsDataURL(file);
+            }
+
+        },
+        getOnloadFunc:function (aImg,index) {
+            let self = this;
+            var imgs = this.state.imgs
+            return function(evt) {
+                console.log(evt.target.result,self);
+                imgs[index].img = evt.target.result;
+                self.setState({
+                    imgs:imgs
+                })
+                aImg.src = evt.target.result;
+            };
+        },
+        render: function () {
+            let self = this;
+            let {imgs} = this.state;
+            return (<div>
+                <div className="imgs_div">
+                    {
+                        imgs.map(function (value, index) {
+                            return (<div className="img_div" style={{
+                                backgroundImage: `url(${value.img})`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundSize: "100% 100%"
+                            }} width="150px" height="120px">
+                                <img src="../src/upload_add.png"/>
+                                <p>{value.title}</p>
+                                <input className={`file${index}`} ref={`file${index}`} type="file" accept="image/*"
+                                       onChange={self.handleClickImg.bind(self,index)}/>
+
+                            </div>)
+                        })
+                    }
+                </div>
+                <button className="upload_but" disabled = {true}>上传</button>
+            </div>);
+        }
+    })
+    ReactDOM.render(
+            <UploadImg />,
+        document.getElementById("upload_img")
+    );
+</script>
+</body>
+</html>

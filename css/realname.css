@@ -16,7 +16,15 @@ input {
     border-radius: 0;
     width: calc(100% - 40px);
     height: 35px;
-    padding: 9.5px 0px;
+    padding: 10px 0px;
+}
+input[type='button']{
+    color: #1e94d4;
+    text-align: left;
+    height: 55px;
+    -webkit-appearance: none;
+    background-color: transparent;
+
 }
 .img_div{
     width: 20px;
@@ -54,11 +62,11 @@ input {
     border-radius: 16px;
     left: calc(100% - 110px);
     top: -43.5px;
+    background-color: transparent;
 }
 
 .next_but{
     width: calc(100% - 40px);
-    bottom: 0px;
     margin: 20px;
     background-color: #1e94d4;
     height: 40px;
@@ -66,8 +74,9 @@ input {
     font-size: 18px;
     border-radius: 3px;
     border-style: none;
-    margin-top: 50px;
+    margin-top: 20px;
 }
+
 .next_but:disabled{
     background-color:#DDDDDD
 }

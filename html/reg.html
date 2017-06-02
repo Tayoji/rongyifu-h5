@@ -44,7 +44,7 @@
                                 <div className="img_div">
                                     <img src={value.icon}/>
                                 </div>
-                                <input placeholder={value.pl}/>
+                                <input placeholder={value.pl} type={index == 1 ? "password" : "number"}/>
                                 <div>
                                     {
                                         index == 2 ? <button className="code_but">获取验证码</button> : null

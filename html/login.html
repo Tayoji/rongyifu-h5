@@ -29,6 +29,10 @@
         },
         render: function () {
             return (<div>
+                <div className="header">
+                    <img className="back" src="../src/reg_di.png"/>
+                    <img className="img" src="../src/reg_header.png"/>
+                </div>
                 <div>
                     {
                         inputs.map(function (value, index) {
@@ -36,7 +40,7 @@
                                 <div className="img_div">
                                     <img src={value.icon}/>
                                 </div>
-                                <input placeholder={value.pl}/>
+                                <input placeholder={value.pl} type={index == 1 ? "password":"number"}/>
                             </div>);
                         })
                     }
