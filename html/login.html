@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>注册</title>
+    <title>易码收银</title>
     <script src="https://cdn.bootcss.com/react/15.4.2/react.min.js"></script>
     <script src="https://cdn.bootcss.com/react/15.4.2/react-dom.min.js"></script>
     <script src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js"></script>
@@ -10,57 +10,52 @@
     <script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
     <meta name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-
 </head>
 <body>
-
-<link rel="stylesheet" type="text/css" href="../css/reg.css" />
-<div id="reg-controller"></div>
+<div id="login_mian"></div>
+<link rel="stylesheet" type="text/css" href="../css/login.css"/>
 
 <script type="text/babel">
-
-    let inputs = [{icon:"../src/reg_user.png",pl:"请输入用户名/手机号"},
-        {icon:"../src/reg_pwd.png",pl:"请输入密码"},
-        {icon:"../src/reg_code.png",pl:"短信验证码"}
+    let inputs = [{icon: "../src/reset_phone.png", pl: "请输入用户名/手机号"},
+        {icon: "../src/reset_code.png", pl: "请输入密码"},
     ];
 
-    var Reg = React.createClass({
-        getInitialState:function () {
+    var Login = React.createClass({
+        getInitialState: function () {
             return {};
         },
-        componentDidMount:function () {
+        componentDidMount: function () {
 
         },
-        render:function () {
+        render: function () {
             return (<div>
-                <div className="header">
-                    <img className="back" src="../src/reg_di.png"/>
-                    <img className="img" src="../src/reg_header.png"/>
-                </div>
                 <div>
                     {
-                        inputs.map(function (value,index) {
+                        inputs.map(function (value, index) {
                             return (<div className="input">
                                 <div className="img_div">
                                     <img src={value.icon}/>
                                 </div>
                                 <input placeholder={value.pl}/>
-                                <div>
-                                    {
-                                        index == 2 ? <button className="code_but">获取验证码</button> : null
-                                    }
-                                </div>
                             </div>);
                         })
                     }
                 </div>
-                <button className="regbut">注册</button>
+                <div className="user_set">
+                    <img className="selected_img" src="../src/login_notselected.png"/>
+                    <p className="remark_lab">记住账号</p>
+                    <p className="forget_pwd">忘记密码</p>
+                </div>
+                <button className="login_but">登录</button>
+                <button className="reg_but">新用户注册</button>
+
             </div>);
         }
     });
+
     ReactDOM.render(
-      <Reg />,
-        document.getElementById('reg-controller')
+            <Login />,
+        document.getElementById('login_mian')
     );
 </script>
 </body>

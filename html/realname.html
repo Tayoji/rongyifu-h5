@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>实名认证</title>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react.min.js"></script>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react-dom.min.js"></script>
+    <script src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="../css/realname.css" />
+
+
+</head>
+<body>
+<div id="real_name_mian"></div>
+
+<script type="text/babel">
+    let inputs = [
+        {icon: "../../src/realname_no.png", pl: "推荐人手机号码（选填）"},
+        {icon: "../../src/realname_shop.png", pl: "店铺名称"},
+        {icon: "../../src/realname_name.png", pl: "本人姓名"},
+        {icon: "../../src/realname_card.png", pl: "本人身份证"},
+        {icon: "../../src/realname_banknum.png", pl: "银行卡号"},
+        {icon: "../../src/realname_bank.png", pl: "开户银行"},
+        {icon: "../../src/realname_address.png", pl: "开户地点"},
+        {icon: "../../src/realname_bankadress.png", pl: "银行网点"},
+        {icon: "../../src/reset_phone.png", pl: "银行预留手机号"},
+        {icon: "../../src/reset_code.png", pl: "短信验证码"}
+    ];
+    var RealName = React.createClass({
+        getInitialState: function () {
+            return {};
+        },
+        getDefaultProps: function () {
+            return {
+                pl: "你想说点什么",
+                icon: "",
+                value: ""
+            };
+        }
+        ,
+        componentDidMount: function () {
+
+        },
+        render: function () {
+            return (
+                    <div>
+                        <div className="alert_div">
+                            <p>友情提示：只有通过实名认证才能有效收款使用</p>
+                            <p>{`当前账户：${1832825255}`}</p>
+                        </div>
+                        <div className="inputs">
+                            {
+                                inputs.map(function (value, index) {
+                                    return (
+                                            <div className="input">
+                                                <div className="img_div">
+                                                    <img src={value.icon}/>
+                                                </div>
+                                                <input placeholder={value.pl}/>
+                                                <div>
+                                                    {
+                                                        index == 9 ? <button className="code_but">获取验证码</button> : null
+                                                    }
+                                                </div>
+                                            </div>);
+                                })
+
+                            }
+                        </div>
+                        <button className="reset_but" disabled="false">重置密码</button>
+                    </div>);
+        }
+    });
+    ReactDOM.render(
+            <RealName />,
+        document.getElementById('real_name_mian')
+    );
+</script>
+</body>
+</html>
