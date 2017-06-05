@@ -25,13 +25,61 @@
     ];
 
     var Reg = React.createClass({
-        getInitialState:function () {
-            return {};
+        getInitialState: function () {
+            return {
+                resetdisabled:true,
+                codedisabled:false
+            };
         },
         componentDidMount:function () {
+            this.user = "";
+            this.pwd = "";
+            this.code = "";
+        },
+        handleTextChange:function (index,e) {
+            switch (index){
+                case 0:
+                    this.user = e.target.value;
+                    break
+                case 1:
+                    this.pwd = e.target.value;
+                    break
+                case 2:
+                    this.code = e.target.value;
+                    break
+            }
+            this.setState({
+                resetdisabled:(this.user.length==0 ||this.pwd.length==0||this.code.length==0)
+            });
+        },
+        handleClickCode:function () {
+            this.setState({
+                codedisabled:true
+            });
+            let self = this;
+            var count = 60;
+            self.refs.codebut.innerText = `${count}s`
+            this.timer = setInterval(function () {
+                count--;
+                if (count < 0){
+                    self.setState({
+                        codedisabled:false
+                    });
+                    self.refs.codebut.innerText = '获取验证码'
+                    clearInterval(self.timer)
+                }else{
+                    self.refs.codebut.innerText = `${count}s`
+                }
+
+            },1000)
+        }
+        ,
+        handleClickRegBut:function () {
 
         },
         render:function () {
+            let {resetdisabled,codedisabled} = this.state;
+            let self = this;
             return (<div>
                 <div className="header">
                     <img className="back" src="../src/reg_di.png"/>
@@ -44,17 +92,17 @@
                                 <div className="img_div">
                                     <img src={value.icon}/>
                                 </div>
-                                <input placeholder={value.pl} type={index == 1 ? "password" : "number"}/>
+                                <input placeholder={value.pl} type={index == 1 ? "password" : "number"} onChange={self.handleTextChange.bind(self,index)}/>
                                 <div>
                                     {
-                                        index == 2 ? <button className="code_but">获取验证码</button> : null
+                                        index == 2 ? <button ref="codebut" className="code_but" disabled={codedisabled} onClick={self.handleClickCode.bind(self)}>获取验证码</button> : null
                                     }
                                 </div>
                             </div>);
                         })
                     }
                 </div>
-                <button className="regbut">注册</button>
+                <button className="regbut" disabled={resetdisabled} onClick={this.handleClickRegBut.bind(this)}>注册</button>
             </div>);
         }
     });

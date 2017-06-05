@@ -31,6 +31,9 @@ p{
     border-radius: 3px;
     border-style: none;
 }
+.login_but:disabled{
+    background-color:#DDDDDD;
+}
 .reg_but{
     position: absolute;
     width: calc(100% - 40px);

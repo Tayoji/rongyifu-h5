@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>商户信息认证</title>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react.min.js"></script>
+    <script src="https://cdn.bootcss.com/react/15.4.2/react-dom.min.js"></script>
+    <script src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js"></script>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.1/style/weui.min.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.min.css">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="../css/infoauthentication.css"/>
+</head>
+<body>
+<div id="infoauthentication_main"></div>
+<script type="text/babel">
+
+    var InfoAuthentication = React.createClass({
+        getInitialState: function () {
+            return {
+                license: null,
+                door: null,
+                environment: null
+
+
+            }
+        },
+        handleClickImg: function (index, obj) {
+            console.log(obj.target.result)
+            for (var i = 0, numFiles = obj.target.files.length; i < numFiles; i++) {
+                var file = obj.target.files[i];
+                var img = document.createElement('img');
+                var reader = new FileReader();
+                reader.onload = this.getOnloadFunc(img, index);
+                reader.readAsDataURL(file);
+            }
+
+        },
+        getOnloadFunc: function (aImg, index) {
+            let self = this;
+            return function (evt) {
+                console.log(evt.target.result, self);
+                let value = evt.target.result;
+                console.log(value);
+                switch (index){
+                    case 0:
+                        self.setState({
+                            license: value
+                        })
+                        break
+                    case 1:
+                        self.setState({
+                            door: value
+                        })
+                        break
+                    case 2:
+                        self.setState({
+                            environment: value
+                        })
+                        break
+
+                }
+
+                aImg.src = evt.target.result;
+            };
+        },
+        render: function () {
+            let {license, door, environment} = this.state;
+            return (<div>
+                <div className="yingye_div">
+                    <div className="yingye_div_img" style={{backgroundImage: `url(${license})`}}>
+                        <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this,0)}/>
+                        <img src="../src/info_add.png"/>
+                        <p>上传营业执照</p>
+                    </div>
+                    <div className="yingye_input_div">
+                        <p>营业执照号：</p>
+                        <input placeholder="请输入营业执照号（注册号）" type="number"/>
+                    </div>
+                </div>
+                <div>
+                    <div className="qiye_title_div">
+                        <img src="../src/info_yuan.png"/>
+                        <p>上传企业相关照片</p>
+                    </div>
+                    <div className="qiye_imgs_div">
+                        <div className="qiye_div_img" style={{backgroundImage: `url(${door})`}}>
+                            <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this,1)}/>
+                            <img src="../src/info_add.png"/>
+                            <p>上传门头照</p>
+                        </div>
+                        <div className="qiye_div_img" style={{backgroundImage: `url(${environment})`}}>
+                            <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this,2)}/>
+                            <img src="../src/info_add.png"/>
+                            <p>上传店内环境</p>
+                        </div>
+
+                    </div>
+                    <button className="submit_but" disabled={true}>点击提交</button>
+
+                </div>
+            </div>);
+        }
+    });
+    ReactDOM.render(
+            <InfoAuthentication/>,
+        document.getElementById('infoauthentication_main')
+    );
+</script>
+</body>
+</html>

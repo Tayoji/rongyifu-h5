@@ -7,27 +7,72 @@
     <script src="https://cdn.bootcss.com/react/15.4.2/react-dom.min.js"></script>
     <script src="https://cdn.bootcss.com/babel-standalone/6.22.1/babel.min.js"></script>
     <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://cdn.bootcss.com/jquery.qrcode/1.0/jquery.qrcode.min.js"></script>
     <meta name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
 </head>
 <body>
 <div id="login_mian"></div>
 <link rel="stylesheet" type="text/css" href="../css/login.css"/>
+<link rel="stylesheet" href="../js/component/loading.css">
+<script src="../js/component/loading.js"></script>
+
+<link rel="stylesheet" href="../js/component/dialog.css">
+<script src="../js/component/dialog.js"></script>
 
 <script type="text/babel">
     let inputs = [{icon: "../src/reset_phone.png", pl: "请输入用户名/手机号"},
         {icon: "../src/reset_code.png", pl: "请输入密码"},
     ];
-
+    let UserKey = "rongyifu_userkey";
+    let selectedImg = "login_selected.png";
+    let notSelectedImg = 'login_notselected.png';
     var Login = React.createClass({
         getInitialState: function () {
-            return {};
+            return {disabled:true};
         },
         componentDidMount: function () {
+            this.user = window.localStorage.getItem(UserKey);
+            this.pwd = "";
+            this.refs.input0.value = this.user;
+        },
+        handleInputChange:function (index,e) {
+            let value = e.target.value;
+            console.log(value);
+            if (index == 0){
+                this.user = value;
+            }else{
+                this.pwd = value;
+            }
+            this.setState({
+                disabled: !(this.user.length > 0 && this.pwd.length > 0)
+            });
+        },
+        handleRemember:function (e) {
+            let src = e.target.src;
+            if (src.indexOf(selectedImg) > 0){
+                e.target.src =  `../src/${notSelectedImg}`;
+                window.localStorage.removeItem(UserKey);
+            }else {
+                e.target.src =  `../src/${selectedImg}`;
+            }
+        }
+        ,
+        handleClickLogin:function () {
+            let src = document.getElementsByClassName("selected_img")[0].src;
+            if (src.indexOf(selectedImg) > 0){
+                window.localStorage.setItem(UserKey,this.user)
+            }
+            console.log(src)
+//            window.localStorage.setItem(UserKey,this.user)
+            lnv.pageloading();
+//            lnv.destroyloading();
 
         },
         render: function () {
+            let self = this;
+            let user = window.localStorage.getItem(UserKey)
+
             return (<div>
                 <div className="header">
                     <img className="back" src="../src/reg_di.png"/>
@@ -40,18 +85,22 @@
                                 <div className="img_div">
                                     <img src={value.icon}/>
                                 </div>
-                                <input placeholder={value.pl} type={index == 1 ? "password":"number"}/>
+                                <input placeholder={value.pl} ref={`input${index}`} type={index == 1 ? "password":"number"} onChange={self.handleInputChange.bind(self,index)}/>
                             </div>);
                         })
                     }
                 </div>
                 <div className="user_set">
-                    <img className="selected_img" src="../src/login_notselected.png"/>
+                    <img className="selected_img"  src={`../src/${user != null && user.length > 0 ? selectedImg :notSelectedImg}`} onClick={this.handleRemember.bind(this)}/>
                     <p className="remark_lab">记住账号</p>
-                    <p className="forget_pwd">忘记密码</p>
+                    <a href="./resetpwd.html">
+                        <p className="forget_pwd" >忘记密码</p>
+                    </a>
                 </div>
-                <button className="login_but">登录</button>
-                <button className="reg_but">新用户注册</button>
+                <button className="login_but" disabled={this.state.disabled} onClick={this.handleClickLogin.bind(this)}>登录</button>
+                <a href="./reg.html">
+                    <button className="reg_but">新用户注册</button>
+                </a>
 
             </div>);
         }

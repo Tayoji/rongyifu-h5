@@ -32,9 +32,9 @@ input {
     max-height: 20px;
     vertical-align: middle;
 }
-
-::placeholder{
+::-webkit-input-placeholder{
     color: #acb5bc;
+
 }
 .input {
     margin-left: 20px;
@@ -54,8 +54,12 @@ input {
     border-radius: 16px;
     left: calc(100% - 110px);
     top: -43.5px;
+    background-color: white;
 }
-
+.code_but:disabled{
+    color:#acb5bc;
+    border-color: #acb5bc;
+}
 .reset_but{
     width: calc(100% - 40px);
     bottom: 0px;

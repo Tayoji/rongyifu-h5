@@ -1,0 +1,118 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+body{
+    background-color: #F0F1F7;
+}
+.yingye_div{
+    width: 100%;
+    background-color: white;
+    text-align: center;
+    padding-top: 20px;
+
+}
+.yingye_div_img,.qiye_div_img{
+    width: 170px;
+    height: 110px;
+    border: 1px solid #e4e4e4;
+    border-radius: 3px;
+    position: relative;
+    margin: 0px auto 15px auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-repeat: repeat;
+    background-size: 100% 100%;
+}
+input[type='file']{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    opacity: 0;
+}
+.yingye_div_img > img,.qiye_div_img >img{
+    width: 32px;
+    height: 32px;
+    margin-bottom: 10px;
+}
+.yingye_div_img > p,.qiye_div_img > p{
+
+    color: #acb5bc;
+    font-size: 12px;
+}
+.yingye_input_div{
+    width: calc(100% - 40px);
+    border-top: 1px solid #e4e4e4;
+    margin-left: 20px;
+    display: flex;
+    height: 44px;
+
+
+}
+.yingye_input_div >p{
+    font-size: 16px;
+    color: #4a4a4a;
+    background-color: white;
+    height: 44px;
+    line-height: 44px;
+
+}
+.yingye_input_div input{
+    border-style: none;
+    font-size: 16px;
+    color: #4a4a4a;
+    flex-grow: 2;
+    height: 42px;
+
+}
+.qiye_title_div {
+    display: flex;
+    margin-top: 20px;
+}
+.qiye_title_div > p{
+    font-size: 14px;
+    color: #4a4a4a;
+    height: 15px;
+    line-height: 15px;
+    flex-grow: 1;
+
+}
+.qiye_title_div > img{
+    width: 15px;
+    height: 15px;
+    margin-left: 20px;
+    margin-right: 5px;
+
+}
+.qiye_imgs_div{
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+    margin-left: 20px;
+
+}
+.qiye_div_img{
+    width: 0;
+    margin-right: 20px;
+    flex-grow: 1;
+    background-color: white;
+}
+
+.submit_but{
+    width: calc(100% - 40px);
+    margin: 20px;
+    background-color: #1e94d4;
+    height: 40px;
+    color: white;
+    font-size: 18px;
+    border-radius: 3px;
+    border-style: none;
+    margin-top: 50px;
+}
+
+.submit_but:disabled{
+    background-color:#DDDDDD
+}
