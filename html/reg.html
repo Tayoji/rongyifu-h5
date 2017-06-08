@@ -13,31 +13,47 @@
 
 </head>
 <body>
+<script src="../js/Api.js" type="text/babel"></script>
+<script src="../js/Tools.js" type="text/babel"></script>
+<link rel="stylesheet" type="text/css" href="../css/reg.css"/>
+<link rel="stylesheet" href="../js/component/loading.css">
+<script src="../js/component/loading.js"></script>
 
-<link rel="stylesheet" type="text/css" href="../css/reg.css" />
+<link rel="stylesheet" href="../js/component/dialog.css">
+<script src="../js/component/dialog.js"></script>
 <div id="reg-controller"></div>
-
 <script type="text/babel">
+    /*
+     lnv.alert({
+     title: '提示',
+     content: '交易成功',
+     alertBtnText: '确定',
+     alertHandler: function(){
 
-    let inputs = [{icon:"../src/reg_user.png",pl:"请输入用户名/手机号"},
-        {icon:"../src/reg_pwd.png",pl:"请输入密码"},
-        {icon:"../src/reg_code.png",pl:"短信验证码"}
+     // 点击确定按钮的回调
+
+     }
+     })
+     * */
+    let inputs = [{icon: "../src/reg_user.png", pl: "请输入用户名/手机号"},
+        {icon: "../src/reg_pwd.png", pl: "请输入密码"},
+        {icon: "../src/reg_code.png", pl: "短信验证码"}
     ];
 
     var Reg = React.createClass({
         getInitialState: function () {
             return {
-                resetdisabled:true,
-                codedisabled:false
+                resetdisabled: true,
+                codedisabled: false
             };
         },
-        componentDidMount:function () {
+        componentDidMount: function () {
             this.user = "";
             this.pwd = "";
             this.code = "";
         },
-        handleTextChange:function (index,e) {
-            switch (index){
+        handleTextChange: function (index, e) {
+            switch (index) {
                 case 0:
                     this.user = e.target.value;
                     break
@@ -49,36 +65,104 @@
                     break
             }
             this.setState({
-                resetdisabled:(this.user.length==0 ||this.pwd.length==0||this.code.length==0)
+                resetdisabled: (this.user.length == 0 || this.pwd.length == 0 || this.code.length == 0)
             });
         },
-        handleClickCode:function () {
+        handleClickCode: function () {
+            if (!checkMobile(this.user)) {
+                lnv.alert({
+                    title: '提示',
+                    content: '手机号格式错误',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            POST(`${host}/commservice/sendSmsCode`,{phonenumber:this.user},function (data) {
+                console.log(data)
+                if (data.status != 200){
+                    lnv.alert({
+                        title: '提示',
+                        content: data.msg,
+                        alertBtnText: '确定',
+                    })
+                }
+            },function (e) {
+                console.log(e);
+            })
             this.setState({
-                codedisabled:true
+                codedisabled: true
             });
             let self = this;
             var count = 60;
             self.refs.codebut.innerText = `${count}s`
             this.timer = setInterval(function () {
                 count--;
-                if (count < 0){
+                if (count < 0) {
                     self.setState({
-                        codedisabled:false
+                        codedisabled: false
                     });
                     self.refs.codebut.innerText = '获取验证码'
                     clearInterval(self.timer)
-                }else{
+                } else {
                     self.refs.codebut.innerText = `${count}s`
                 }
 
-            },1000)
+            }, 1000)
         }
         ,
-        handleClickRegBut:function () {
+        handleClickRegBut: function () {
+            if (!checkMobile(this.user)){
+                lnv.alert({
+                    title: '提示',
+                    content: '手机号格式错误',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            if (!checkPwd(this.pwd)){
+                lnv.alert({
+                    title: '提示',
+                    content: '密码格式错误',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            if (!checkCode(this.code)){
+                lnv.alert({
+                    title: '提示',
+                    content: '验证码格式错误',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            lnv.pageloading("sssfsff")
+            POST(`${host}/userservice/register`,{phonenumber:this.user,password:this.pwd,authCode:this.code},function (data) {
+                lnv.destroyloading()
+                if (data.status == 200){
+                    console.log("sssss",data)
+                    window.location.href = 'login.html'
+                }else{
+                    console.log("DDDD",data)
+
+                    lnv.alert({
+                        title: '提示',
+                        content: data.msg,
+                        alertBtnText: '确定',
+                    })
+                }
+            },function (e)
+            {
+               lnv.destroyloading()
+                lnv.alert({
+                    title: '提示',
+                    content: '请求失败',
+                    alertBtnText: '确定',
+                })
+            })
 
         },
-        render:function () {
-            let {resetdisabled,codedisabled} = this.state;
+        render: function () {
+            let {resetdisabled, codedisabled} = this.state;
             let self = this;
             return (<div>
                 <div className="header">
@@ -87,27 +171,31 @@
                 </div>
                 <div>
                     {
-                        inputs.map(function (value,index) {
+                        inputs.map(function (value, index) {
                             return (<div className="input">
                                 <div className="img_div">
                                     <img src={value.icon}/>
                                 </div>
-                                <input placeholder={value.pl} type={index == 1 ? "password" : "number"} onChange={self.handleTextChange.bind(self,index)}/>
+                                <input placeholder={value.pl} type={index == 1 ? "password" : "number"}
+                                       onChange={self.handleTextChange.bind(self, index)}/>
                                 <div>
                                     {
-                                        index == 2 ? <button ref="codebut" className="code_but" disabled={codedisabled} onClick={self.handleClickCode.bind(self)}>获取验证码</button> : null
+                                        index == 2 ? <button ref="codebut" className="code_but" disabled={codedisabled}
+                                                             onClick={self.handleClickCode.bind(self)}>
+                                            获取验证码</button> : null
                                     }
                                 </div>
                             </div>);
                         })
                     }
                 </div>
-                <button className="regbut" disabled={resetdisabled} onClick={this.handleClickRegBut.bind(this)}>注册</button>
+                <button className="regbut" disabled={resetdisabled} onClick={this.handleClickRegBut.bind(this)}>注册
+                </button>
             </div>);
         }
     });
     ReactDOM.render(
-      <Reg />,
+            <Reg />,
         document.getElementById('reg-controller')
     );
 </script>
