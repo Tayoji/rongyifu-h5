@@ -9,12 +9,20 @@
     <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
     <meta name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    <link rel="stylesheet" type="text/css" href="../css/realname.css" />
+    <link rel="stylesheet" type="text/css" href="../css/realname.css"/>
 
     <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.1/style/weui.min.css">
     <link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
-    <script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/city-picker.js"></script>
+    <script src="../js/Api.js" type="text/babel"></script>
+    <link rel="stylesheet" href="../js/component/loading.css">
+    <script src="../js/component/loading.js"></script>
+
+    <link rel="stylesheet" href="../js/component/dialog.css">
+    <script src="../js/component/dialog.js"></script>
+    <script src="../js/component/city-picker.js"></script>
+
+
 </head>
 <div id="real_name_mian"></div>
 
@@ -44,53 +52,164 @@
         }
         ,
         componentDidMount: function () {
-
-
-            $("#input5").picker({
-                title: "请选择您的开户银行",
-                cols: [
-                    {
-                        textAlign: 'center',
-                        values: ['农业银行', '建设银行', '工商银行', '广发银行', '招商银行', '中国银行']
-                    }
-                ]
-            });
+            this.bankcod = null;
+            this.areacod = null;
+            this.bankno = null;
+            let self = this;
             $("#input6").cityPicker({
+                title: "请选择银行开户地点",
                 showDistrict: false,
-                title:'请选择您的开户银行地点',
-            });
-            $("#input7").picker({
-                title: "请选择您的银行网点",
-                cols: [
-                    {
-                        textAlign: 'center',
-                        values: ['农业银行xx支行', '建设银行xx支行', '工商银行xx支行', '广发银行xx支行', '招商银行xx支行', '中国银行xx支行']
-                    }
-                ]
-            });
-//            $("#input6").cityPicker({
-//                title: "选择出发地",
-//                onChange: function (picker, values, displayValues) {
-//                    console.log(values, displayValues);
-//                }
-//            });
+                onClose: function (value) {
+                    console.log(value.value);
+                    self.areacod = value.value[1];
+                }
+            })
 
         },
-        handleClick:function (index,e) {
-            console.log(index);
-            switch (index){
-                case 5:
+        setBankPicker: function () {
+            let self = this;
+            if (this.banks == null) {
+                POST(`${host}/commservice/findBigBank`, null, function (data) {
+                    console.log(data);
+                    if (data.status == 1) {
+                        self.banks = data.data;
+                        $("#input5").picker({
+                            title: "请选择您的开户银行",
+                            cols: [
+                                {
+                                    textAlign: 'center',
+                                    values: self.banks.map(function (value) {
+                                        return value.banknam;
+                                    })
+                                }
+                            ],
+                            onClose: function (value) {
+                                console.log(value)
+                                let items = self.banks.filter(function (e) {
+                                    return e.banknam === value.value[0];
+                                })
+                                self.bankcod = items[0].bankcod;
+                            }
+                        });
+                        $("#input5").picker("open");
 
+                    }
+                }, function (e) {
+                    console.log(e)
+                })
+            }
+        },
+        setBankAdress: function () {
+            let self = this;
+            POST(`${host}/commservice/findProvinceAll`, null, function (data) {
+                lnv.destroyloading()
+                if (data.status == 1) {
+                    self.provinces = data.data;
+                    let province = self.provinces.map(function (value) {
+                        let citys = self.setCityByParcod(value.areacod);
+                        return {"name": value.areanam, "code": value.areacod, "sub": citys}
+                    })
+                    console.log(JSON.stringify(province));
+
+                }
+            }, function (e) {
+                lnv.destroyloading()
+
+            })
+        },
+        setCityByParcod: function (value) {
+            let self = this;
+            console.log(value);
+            var citys = new Array();
+            $.ajax({
+                url: `${host}/commservice/findCityByParcod`,
+                type: 'POST', // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
+                data: {parcod: value},
+                async: false,
+                success: function (res) {
+                    console.log('成功');
+
+                    if (res.status == 1) {
+                        citys = res.data;
+
+                    }
+                },
+                error: function (e) {
+                    console.log('失败');
+
+                }
+            })
+            let test = [{"name": "测试", "code": "12345"}];
+            return citys.map(function (item) {
+                return {"name": item.areanam, "code": item.areacod, "sub": test}
+            })
+        },
+        setBankBranchPicker:function () {
+            lnv.pageloading()
+            let self = this;
+            console.log({bankcodAndAreacod:`${this.bankcod}${this.areacod}`});
+            POST(`${host}/commservice/findBankBranch`,{bankcodAndAreacod:`${this.bankcod}${this.areacod}`},function (res) {
+                lnv.destroyloading()
+                if (res.status == 1){
+                    $('body').append('<input style="display: none" id="picker-branch"/>')
+                    $('#picker-branch').picker({
+                        title: "请选择您的银行网点",
+                        cols: [
+                            {
+                                textAlign: 'center',
+                                values: res.data.map(function (e) {
+                                    return e.banknam;
+                                })
+                            }
+                        ],
+                        onChange:function (e) {
+                            $("#input7").val(e.value[0]) ;
+                            $("#input7").attr('readonly',true);
+
+                        },
+                        onClose:function (value) {
+                            $("#picker-branch").remove();
+                            let items = res.data.filter(function (e) {
+                                return e.banknam === value.value[0];
+                            })
+                            self.bankno = items[0].bankno;
+
+                        }
+                    });
+                    $("#picker-branch").picker('open')
+
+                }else{
+                    lnv.alert({
+                        title: '提示',
+                        content: res.msg,
+                        alertBtnText: '确定',
+                    })
+                }
+            },function (e) {
+                lnv.destroyloading()
+
+            })
+        }
+        ,
+        handleClick: function (index, e) {
+            let self = this;
+            switch (index) {
+                case 5:
+                    $("#input5").blur();
+                    this.setBankPicker();
                     break
                 case 6:
+
                     break
                 case 7:
+                    $("#input7").blur();
+                    this.setBankBranchPicker()
                     break
             }
         }
         ,
-        setInputType:function (index) {
-          return index>=5 && index<=7 ? 'button':'text';
+        setInputType: function (index) {
+            return index >= 5 && index <= 7 ? 'button' : 'text';
         },
         render: function () {
             let self = this;
@@ -108,17 +227,17 @@
                                                 <div className="img_div">
                                                     <img src={value.icon}/>
                                                 </div>
-                                                <input placeholder={value.pl}    id={`input${index}`} type={function () {
-                                                    if (index == 1){
+                                                <input readOnly = {index >= 5 && index <= 7 ? true : false} placeholder={value.pl} id={`input${index }`} type={function () {
+                                                    if (index == 1) {
                                                         return 'text';
-                                                    }else if(index == 3){
+                                                    } else if (index == 3) {
                                                         return 'number';
-                                                    }else if (index>=5 && index<=7){
+                                                    } else if (index >= 5 && index <= 7) {
                                                         return 'text';
-                                                    }else{
+                                                    } else {
                                                         return 'tel';
                                                     }
-                                                }()}  onClick={self.handleClick.bind(self,index)}/>
+                                                }()} onClick={self.handleClick.bind(self, index)}/>
                                                 <div>
                                                     {
                                                         index == 9 ? <button className="code_but">获取验证码</button> : null

@@ -72,11 +72,8 @@ var lnv = lnv || {};
     	return new Loading().iconLoad(container)
     };
 
-    lnv.pageloading = function(title){
+    lnv.pageloading = function(){
         let loading = new Loading().pageLoad()
-        if (title != nil) {
-            document.getElementsByClassName("lnv-toast-content").innerText = title;
-        }
     	return loading;
     };
 
