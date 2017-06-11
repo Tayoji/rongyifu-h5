@@ -18,8 +18,8 @@ function request(url, method, data, success, fail) {
             url: url,
             type: method, // OPTIONS, GET, HEAD, POST, PUT, DELETE, TRACE, CONNECT
             data:data,
-             // headers: {'Access-Control-Allow-Origin':"*",
-             // }, // 设置请求的 header
+            // headers: {"Content-Type":"multipart/form-data;",
+            //  }, // 设置请求的 header
             success: function (res) {
                 success(res);
             },

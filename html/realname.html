@@ -14,13 +14,14 @@
     <link rel="stylesheet" href="https://cdn.bootcss.com/weui/1.1.1/style/weui.min.css">
     <link href="https://cdn.bootcss.com/jquery-weui/1.0.1/css/jquery-weui.css" rel="stylesheet">
     <script src="https://cdn.bootcss.com/jquery-weui/1.0.1/js/jquery-weui.min.js"></script>
-    <script src="../js/Api.js" type="text/babel"></script>
+    <script src="../js/Api.js"></script>
     <link rel="stylesheet" href="../js/component/loading.css">
     <script src="../js/component/loading.js"></script>
 
     <link rel="stylesheet" href="../js/component/dialog.css">
     <script src="../js/component/dialog.js"></script>
     <script src="../js/component/city-picker.js"></script>
+    <script src="../js/Tools.js"></script>
 
 
 </head>
@@ -28,20 +29,20 @@
 
 <script type="text/babel">
     let inputs = [
-        {icon: "../../src/realname_no.png", pl: "推荐人手机号码（选填）"},
-        {icon: "../../src/realname_shop.png", pl: "店铺名称"},
-        {icon: "../../src/realname_name.png", pl: "本人姓名"},
-        {icon: "../../src/realname_card.png", pl: "本人身份证"},
-        {icon: "../../src/realname_banknum.png", pl: "银行卡号"},
-        {icon: "../../src/realname_bank.png", pl: "开户银行"},
-        {icon: "../../src/realname_address.png", pl: "开户地点"},
-        {icon: "../../src/realname_bankadress.png", pl: "银行网点"},
-        {icon: "../../src/reset_phone.png", pl: "银行预留手机号"},
-        {icon: "../../src/reset_code.png", pl: "短信验证码"}
+        {icon: "../../src/realname_no.png", pl: "推荐人手机号码（选填）", ref: 'no'},
+        {icon: "../../src/realname_shop.png", pl: "店铺名称", ref: 'shop'},
+        {icon: "../../src/realname_name.png", pl: "本人姓名", ref: 'name'},
+        {icon: "../../src/realname_card.png", pl: "本人身份证", ref: 'card'},
+        {icon: "../../src/realname_banknum.png", pl: "银行卡号", ref: 'banknum'},
+        {icon: "../../src/realname_bank.png", pl: "开户银行", ref: 'bank'},
+        {icon: "../../src/realname_address.png", pl: "开户地点", ref: 'address'},
+        {icon: "../../src/realname_bankadress.png", pl: "银行网点", ref: 'bankadress'},
+        {icon: "../../src/reset_phone.png", pl: "银行预留手机号", ref: 'phone'},
+        {icon: "../../src/reset_code.png", pl: "短信验证码", ref: 'code'}
     ];
     var RealName = React.createClass({
         getInitialState: function () {
-            return {};
+            return {codedisabled: false, nextdisabled: true};
         },
         getDefaultProps: function () {
             return {
@@ -53,15 +54,26 @@
         ,
         componentDidMount: function () {
             this.bankcod = null;
+            this.provincecod = null;
             this.areacod = null;
             this.bankno = null;
+            this.bankcode = null;
             let self = this;
+            this.mercid = getQueryString("mercid");
+            if (this.mercid == null) {
+                this.mercid = "M00000290000000";
+            }
+            console.log(getQueryString("mercid"))
+
             $("#input6").cityPicker({
                 title: "请选择银行开户地点",
                 showDistrict: false,
                 onClose: function (value) {
                     console.log(value.value);
+                    self.provincecod = value.value[0];
                     self.areacod = value.value[1];
+                    self.handleTextChange();
+
                 }
             })
 
@@ -69,8 +81,10 @@
         setBankPicker: function () {
             let self = this;
             if (this.banks == null) {
+                lnv.pageloading()
                 POST(`${host}/commservice/findBigBank`, null, function (data) {
                     console.log(data);
+                    lnv.destroyloading()
                     if (data.status == 1) {
                         self.banks = data.data;
                         $("#input5").picker({
@@ -89,17 +103,308 @@
                                     return e.banknam === value.value[0];
                                 })
                                 self.bankcod = items[0].bankcod;
+                                self.bankno = items[0].bankno;
+                                self.handleTextChange();
                             }
                         });
                         $("#input5").picker("open");
 
                     }
                 }, function (e) {
+                    lnv.destroyloading()
                     console.log(e)
                 })
             }
         },
-        setBankAdress: function () {
+        setBankBranchPicker: function () {
+            lnv.pageloading()
+            let self = this;
+            console.log({bankcodAndAreacod: `${this.bankcod}${this.areacod}`});
+            POST(`${host}/commservice/findBankBranch`, {bankcodAndAreacod: `${this.bankcod}${this.areacod}`}, function (res) {
+                lnv.destroyloading()
+                if (res.status == 1) {
+                    $('body').append('<input style="display: none" id="picker-branch"/>')
+                    $('#picker-branch').picker({
+                        title: "请选择您的银行网点",
+                        cols: [
+                            {
+                                textAlign: 'center',
+                                values: res.data.map(function (e) {
+                                    return e.banknam;
+                                })
+                            }
+                        ],
+                        onChange: function (e) {
+                            $("#input7").val(e.value[0]);
+                            $("#input7").attr('readonly', true);
+
+                        },
+                        onClose: function (value) {
+                            $("#picker-branch").remove();
+                            let items = res.data.filter(function (e) {
+                                return e.banknam === value.value[0];
+                            })
+                            self.bankcode = items[0].bankno;
+                            self.handleTextChange();
+
+
+                        }
+                    });
+                    $("#picker-branch").picker('open')
+
+                } else {
+                    lnv.alert({
+                        title: '提示',
+                        content: res.msg,
+                        alertBtnText: '确定',
+                    })
+                }
+            }, function (e) {
+                lnv.destroyloading()
+
+            })
+        }
+        ,
+        handleClick: function (index, e) {
+            let self = this;
+            switch (index) {
+                case 5:
+                    $("#input5").blur();
+                    this.setBankPicker();
+                    break
+                case 6:
+
+                    break
+                case 7:
+                    $("#input7").blur();
+                    this.setBankBranchPicker()
+                    break
+            }
+        }
+        ,
+        setInputType: function (index) {
+            return index >= 5 && index <= 7 ? 'button' : 'text';
+        },
+        handleTextChange: function () {
+            let shop = this.refs.shop.value;
+            let name = this.refs.name.value;
+            let card = this.refs.card.value;
+            let bank = this.refs.bank.value;
+            let banknum = this.refs.banknum.value;
+            let address = this.refs.address.value;
+            let bankadress = this.refs.bankadress.value;
+            let phone = this.refs.phone.value;
+            let code = this.refs.code.value;
+            this.setState({
+                nextdisabled: (shop.length == 0 || name.length == 0 || card.length == 0 || bank.length == 0 ||
+                banknum.length == 0 || address.length == 0 || bankadress.length == 0 || phone.length == 0 || code.length == 0)
+
+            })
+
+        },
+        handleClickCodebBut: function () {
+            if (!checkMobile(this.refs.phone.value)) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请输入正确的手机号',
+                    alertBtnText: '确定',
+
+                })
+                return
+            }
+            POST(`${host}/commservice/sendSmsCode`, {phonenumber: this.refs.phone.value}, function (data) {
+                console.log(data)
+                if (data.status != 200) {
+                    lnv.alert({
+                        title: '提示',
+                        content: data.msg,
+                        alertBtnText: '确定',
+                    })
+                }
+            }, function (e) {
+                console.log(e);
+            })
+            this.setState({
+                codedisabled: true
+            });
+            let self = this;
+            var count = 60;
+            self.refs.codebut.innerText = `${count}s`
+            this.timer = setInterval(function () {
+                count--;
+                if (count < 0) {
+                    self.setState({
+                        codedisabled: false
+                    });
+                    self.refs.codebut.innerText = '获取验证码'
+                    clearInterval(self.timer)
+                } else {
+                    self.refs.codebut.innerText = `${count}s`
+                }
+
+            }, 1000)
+
+        },
+        handleClickNext: function () {
+            let banknum = this.refs.banknum.value;
+            if (this.mercid == null) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请先登录或者注册后再来吧！',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            if (!checkBank(banknum)) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请填写正确的银行卡号',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            let card = this.refs.card.value;
+            if (!checkCarkNo(card)) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请填写正确的身份证号',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            let phone = this.refs.phone.value;
+            if (!checkMobile(phone)) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请填写正确的银行预留手机号',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            let code = this.refs.code.value;
+            if (!checkCode(code)) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请填写正确的验证码',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            let shop = this.refs.shop.value;
+            let name = this.refs.name.value;
+            let no = this.refs.no.value;
+
+            let address = this.refs.address.value.split(" ");
+            console.log(address);
+            var parameter = {
+                mercid: this.mercid,
+                referrer: no,
+                nameOfShop: shop,
+                userName: name,
+                idCard: card,
+                bankCard: banknum,
+                phoneNumber: phone,
+                authCode: code,
+                openBank: this.refs.bank.value,
+                openProvince: address[0],
+                openCity: address[1],
+                bankAddress: this.refs.bankadress.value,
+                bigbankcod: this.bankcod,
+                bankno: this.bankno,
+                bankcode: this.bankcode
+            };
+            if (no.length > 0) {
+                parameter.referrer = no;
+            }
+            console.log(parameter);
+            lnv.pageloading();
+            POST(`${host}/userservice/realNameMessage`, parameter, function (res) {
+                lnv.destroyloading()
+                console.log(res);
+                if (res.status == 1){
+                    lnv.alert({
+                        title: '提示',
+                        content: res.msg,
+                        alertBtnText: '确定',
+                    })
+                    window.location.href = `uploadimg.html?mercid=${res.data}`
+                }else {
+                    lnv.alert({
+                        title: '提示',
+                        content: res.msg,
+                        alertBtnText: '确定',
+                    })
+                }
+            }, function (e) {
+                lnv.destroyloading()
+
+            })
+
+
+        },
+        render: function () {
+            let self = this;
+            return (
+                    <div>
+                        <div className="alert_div">
+                            <p>友情提示：只有通过实名认证才能有效收款使用</p>
+                            <p>{`当前账户：${1832825255}`}</p>
+                        </div>
+                        <div className="inputs">
+                            {
+                                inputs.map(function (value, index) {
+                                    return (
+                                            <div className="input">
+                                                <div className="img_div">
+                                                    <img src={value.icon}/>
+                                                </div>
+                                                <input ref={value.ref}
+                                                       readOnly={index >= 5 && index <= 7 ? true : false}
+                                                       placeholder={value.pl} id={`input${index }`} type={function () {
+                                                    if (index == 1) {
+                                                        return 'text';
+                                                    } else if (index == 3) {
+                                                        return 'number';
+                                                    } else if (index >= 5 && index <= 7) {
+                                                        return 'text';
+                                                    } else {
+                                                        return 'tel';
+                                                    }
+                                                }()} onClick={self.handleClick.bind(self, index)}
+                                                       onChange={self.handleTextChange.bind(self)}
+                                                />
+                                                <div>
+                                                    {
+                                                        index == 9 ?
+                                                                <button ref="codebut" disabled={self.state.codedisabled}
+                                                                        className="code_but"
+                                                                        onClick={self.handleClickCodebBut.bind(self)}>
+                                                                    获取验证码</button> : null
+                                                    }
+                                                </div>
+                                            </div>);
+                                })
+
+                            }
+                        </div>
+                        <button className="next_but" disabled={this.state.nextdisabled}
+                                onClick={this.handleClickNext.bind(this)}>下一步
+                        </button>
+                    </div>);
+        }
+    });
+    ReactDOM.render(
+            <RealName />,
+        document.getElementById('real_name_mian')
+    );
+
+</script>
+
+</body>
+</html>
+<!--<div>
+
+ setBankAdress: function () {
             let self = this;
             POST(`${host}/commservice/findProvinceAll`, null, function (data) {
                 lnv.destroyloading()
@@ -144,120 +449,7 @@
                 return {"name": item.areanam, "code": item.areacod, "sub": test}
             })
         },
-        setBankBranchPicker:function () {
-            lnv.pageloading()
-            let self = this;
-            console.log({bankcodAndAreacod:`${this.bankcod}${this.areacod}`});
-            POST(`${host}/commservice/findBankBranch`,{bankcodAndAreacod:`${this.bankcod}${this.areacod}`},function (res) {
-                lnv.destroyloading()
-                if (res.status == 1){
-                    $('body').append('<input style="display: none" id="picker-branch"/>')
-                    $('#picker-branch').picker({
-                        title: "请选择您的银行网点",
-                        cols: [
-                            {
-                                textAlign: 'center',
-                                values: res.data.map(function (e) {
-                                    return e.banknam;
-                                })
-                            }
-                        ],
-                        onChange:function (e) {
-                            $("#input7").val(e.value[0]) ;
-                            $("#input7").attr('readonly',true);
 
-                        },
-                        onClose:function (value) {
-                            $("#picker-branch").remove();
-                            let items = res.data.filter(function (e) {
-                                return e.banknam === value.value[0];
-                            })
-                            self.bankno = items[0].bankno;
 
-                        }
-                    });
-                    $("#picker-branch").picker('open')
 
-                }else{
-                    lnv.alert({
-                        title: '提示',
-                        content: res.msg,
-                        alertBtnText: '确定',
-                    })
-                }
-            },function (e) {
-                lnv.destroyloading()
-
-            })
-        }
-        ,
-        handleClick: function (index, e) {
-            let self = this;
-            switch (index) {
-                case 5:
-                    $("#input5").blur();
-                    this.setBankPicker();
-                    break
-                case 6:
-
-                    break
-                case 7:
-                    $("#input7").blur();
-                    this.setBankBranchPicker()
-                    break
-            }
-        }
-        ,
-        setInputType: function (index) {
-            return index >= 5 && index <= 7 ? 'button' : 'text';
-        },
-        render: function () {
-            let self = this;
-            return (
-                    <div>
-                        <div className="alert_div">
-                            <p>友情提示：只有通过实名认证才能有效收款使用</p>
-                            <p>{`当前账户：${1832825255}`}</p>
-                        </div>
-                        <div className="inputs">
-                            {
-                                inputs.map(function (value, index) {
-                                    return (
-                                            <div className="input">
-                                                <div className="img_div">
-                                                    <img src={value.icon}/>
-                                                </div>
-                                                <input readOnly = {index >= 5 && index <= 7 ? true : false} placeholder={value.pl} id={`input${index }`} type={function () {
-                                                    if (index == 1) {
-                                                        return 'text';
-                                                    } else if (index == 3) {
-                                                        return 'number';
-                                                    } else if (index >= 5 && index <= 7) {
-                                                        return 'text';
-                                                    } else {
-                                                        return 'tel';
-                                                    }
-                                                }()} onClick={self.handleClick.bind(self, index)}/>
-                                                <div>
-                                                    {
-                                                        index == 9 ? <button className="code_but">获取验证码</button> : null
-                                                    }
-                                                </div>
-                                            </div>);
-                                })
-
-                            }
-                        </div>
-                        <button className="next_but" disabled="false">下一步</button>
-                    </div>);
-        }
-    });
-    ReactDOM.render(
-            <RealName />,
-        document.getElementById('real_name_mian')
-    );
-
-</script>
-
-</body>
-</html>
+</div>-->

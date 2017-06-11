@@ -12,6 +12,15 @@
     <meta name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
     <link rel="stylesheet" type="text/css" href="../css/infoauthentication.css"/>
+
+    <script src="../js/Api.js"></script>
+    <link rel="stylesheet" href="../js/component/loading.css">
+    <script src="../js/component/loading.js"></script>
+
+    <link rel="stylesheet" href="../js/component/dialog.css">
+    <script src="../js/component/dialog.js"></script>
+    <script src="../js/component/city-picker.js"></script>
+    <script src="../js/Tools.js"></script>
 </head>
 <body>
 <div id="infoauthentication_main"></div>
@@ -22,10 +31,20 @@
             return {
                 license: null,
                 door: null,
-                environment: null
-
-
+                environment: null,
+                disabled: true
             }
+        },
+        componentDidMount: function () {
+            this.mercid = getQueryString("mercid");
+            if (this.mercid == null) {
+                this.mercid = "M00000290000000";
+            }
+            console.log(getQueryString("mercid"));
+
+            this.businessLicense = null;
+            this.doorwayPic = null;
+            this.shopInteriorPic = null;
         },
         handleClickImg: function (index, obj) {
             console.log(obj.target.result)
@@ -41,43 +60,204 @@
         getOnloadFunc: function (aImg, index) {
             let self = this;
             return function (evt) {
-                console.log(evt.target.result, self);
-                let value = evt.target.result;
-                console.log(value);
-                switch (index){
-                    case 0:
-                        self.setState({
-                            license: value
-                        })
-                        break
-                    case 1:
-                        self.setState({
-                            door: value
-                        })
-                        break
-                    case 2:
-                        self.setState({
-                            environment: value
-                        })
-                        break
 
+                var image = new Image();
+                image.onload = function () {
+                    var cvs = document.createElement('canvas');
+                    var scale = 1;
+                    let fileType = 'image/png';
+                    if (this.width > 500 || this.height > 500) {  //1000只是示例，可以根据具体的要求去设定
+                        if (this.width > this.height) {
+                            scale = 500 / this.width;
+                        } else {
+                            scale = 500 / this.height;
+                        }
+                    }
+                    cvs.width = this.width * scale;
+                    cvs.height = this.height * scale;     //计算等比缩小后图片宽高
+                    var ctx = cvs.getContext('2d');
+                    ctx.drawImage(this, 0, 0, cvs.width, cvs.height);
+                    var newImageData = cvs.toDataURL(fileType, 0.8);   //重新生成图片，
+                    self.uploadImg(index, newImageData);
                 }
+                image.src = evt.target.result;
 
-                aImg.src = evt.target.result;
             };
         },
+        uploadImg: function (index, result) {
+            var path = "";
+            var formData = new FormData();
+            let self = this;
+            var data = convertBase64UrlToBlob(result.replace("data:" + 'image/png' + ";base64,", ''));
+            switch (index) {
+                case 0:
+
+                    path = "/fileservice/uploadBusinessLicense";
+                    formData.append("businessLicense", convertBase64UrlToBlob(result), "businessLicense.png");
+                    break
+                case 1:
+                    path = "/fileservice/uploadDoorwayPic";
+                    formData.append("doorwayPic", data, "doorwayPic.png");
+                    break
+                case 2:
+                    path = "/fileservice/uploadShopInteriorPic";
+                    formData.append("shopInteriorPic", data, "shopInteriorPic.png");
+                    break
+                default:
+                    break
+
+            }
+            var imgs = this.state.imgs
+            lnv.pageloading();
+            $.ajax({
+                url: `${host}${path}`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    lnv.destroyloading()
+                    if (res.status === 1) {
+                        switch (index) {
+                            case 0:
+                                self.businessLicense = res.data;
+                                self.setState({
+                                    license: result
+                                })
+                                break
+                            case 1:
+                                self.doorwayPic = res.data;
+                                self.setState({
+                                    door: result
+                                })
+                                break
+                            case 2:
+                                self.setState({
+                                    environment: result
+                                })
+                                self.shopInteriorPic = res.data;
+                                break
+                        }
+                        self.setState({
+                            disabled: (self.businessLicense == null || self.doorwayPic == null || self.shopInteriorPic == null )
+                        })
+                    } else {
+                        lnv.alert({
+                            title: '提示',
+                            content: res.msg,
+                            alertBtnText: '确定',
+                        })
+                    }
+                },
+                error: function (e) {
+                    lnv.destroyloading()
+                    lnv.alert({
+                        title: '提示',
+                        content: '上传失败',
+                        alertBtnText: '确定',
+                    })
+                }
+            });
+
+        },
+        uploadShopInteriorPic: function () {
+            if (this.mercid == null) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请先登录或者注册后再来吧！',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            let number = this.refs.number.value;
+            if (number.length == 0) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请输入营业执照号',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            lnv.pageloading()
+            let p =  {
+                mercid: this.mercid,
+                businessLicense: this.businessLicense,
+                doorwayPic: this.doorwayPic,
+                shopInteriorPic:this.shopInteriorPic,
+                businessNumber:number
+            }
+            console.log(p);
+            POST(`${host}/userservice/uploadAttestationPic`,p,function (res) {
+                lnv.destroyloading()
+                lnv.alert({
+                    title: '提示',
+                    content: res.msg,
+                    alertBtnText: '确定',
+                })
+            },function (e) {
+                lnv.destroyloading()
+                lnv.alert({
+                    title: '提示',
+                    content: '上传失败',
+                    alertBtnText: '确定',
+                })
+            })
+//            var formData = new FormData();
+//            formData.append("mercid", this.mercid);
+//            formData.append("businessLicense", this.businessLicense);
+//            formData.append("doorwayPic", this.doorwayPic);
+//            formData.append("shopInteriorPic", this.shopInteriorPic);
+//            formData.append("businessNumber", number);
+//            $.ajax({
+//                url: `${host}/fileservice/uploadShopInteriorPic`,
+//                type: 'POST',
+//                data: formData,
+//                processData: false,
+//                contentType: false,
+//                success: function (res) {
+//                    lnv.destroyloading()
+//                    lnv.alert({
+//                        title: '提示',
+//                        content: res.msg,
+//                        alertBtnText: '确定',
+//                    })
+////                    if (res.status === 1) {
+////                        lnv.alert({
+////                            title: '提示',
+////                            content: res.msg,
+////                            alertBtnText: '确定',
+////                        })
+////                    } else {
+////                        lnv.alert({
+////                            title: '提示',
+////                            content: res.msg,
+////                            alertBtnText: '确定',
+////                        })
+////                    }
+//                },
+//                error: function (e) {
+//                    lnv.destroyloading()
+//                    lnv.alert({
+//                        title: '提示',
+//                        content: '上传失败',
+//                        alertBtnText: '确定',
+//                    })
+//                }
+//            });
+        }
+        ,
         render: function () {
-            let {license, door, environment} = this.state;
+            let {license, door, environment, disabled} = this.state;
             return (<div>
                 <div className="yingye_div">
                     <div className="yingye_div_img" style={{backgroundImage: `url(${license})`}}>
-                        <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this,0)}/>
+                        <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this, 0)}/>
                         <img src="../src/info_add.png"/>
                         <p>上传营业执照</p>
                     </div>
                     <div className="yingye_input_div">
                         <p>营业执照号：</p>
-                        <input placeholder="请输入营业执照号（注册号）" type="number"/>
+                        <input placeholder="请输入营业执照号（注册号）" type="number" ref="number"/>
                     </div>
                 </div>
                 <div>
@@ -87,18 +267,20 @@
                     </div>
                     <div className="qiye_imgs_div">
                         <div className="qiye_div_img" style={{backgroundImage: `url(${door})`}}>
-                            <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this,1)}/>
+                            <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this, 1)}/>
                             <img src="../src/info_add.png"/>
                             <p>上传门头照</p>
                         </div>
                         <div className="qiye_div_img" style={{backgroundImage: `url(${environment})`}}>
-                            <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this,2)}/>
+                            <input type="file" accept="image/*" onChange={this.handleClickImg.bind(this, 2)}/>
                             <img src="../src/info_add.png"/>
                             <p>上传店内环境</p>
                         </div>
 
                     </div>
-                    <button className="submit_but" disabled={true}>点击提交</button>
+                    <button className="submit_but" onClick={this.uploadShopInteriorPic.bind(this)} disabled={disabled}>
+                        点击提交
+                    </button>
 
                 </div>
             </div>);

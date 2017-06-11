@@ -65,10 +65,52 @@ checkPhone(str){
 function
 checkEmail(str){
     var
-        re = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/
+        re = /^(\w-*\.*)+@(\w-?)+(\.\w{2,})+$/;
     if(re.test(str)){
         return true;
     }else{
         return false;
     }
+}
+
+//验证银行卡
+function
+checkBank(str){
+    var
+        re = /^\d{16}|\d{19}$/;
+    if(re.test(str)){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+//验证身份证
+function
+checkCarkNo(str){
+    var re = /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/;
+    if(re.test(str)){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+function getQueryString(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) return unescape(r[2]); return null;
+}
+
+function convertBase64UrlToBlob(urlData){
+   let path = urlData.split(',').pop();
+    var bytes=window.atob(path);        //去掉url的头，并转换为byte
+    //处理异常,将ascii码小于0的转换为大于0
+    var ab = new ArrayBuffer(bytes.length);
+    var ia = new Uint8Array(ab);
+    for (var i = 0; i < bytes.length; i++) {
+        ia[i] = bytes.charCodeAt(i);
+    }
+
+    return new Blob( [ab] , {type : 'image/png'});
 }

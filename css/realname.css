@@ -72,7 +72,10 @@ input[type='button']{
     top: -43.5px;
     background-color: transparent;
 }
-
+.code_but:disabled{
+    color:#acb5bc;
+    border-color: #acb5bc;
+}
 .next_but{
     width: calc(100% - 40px);
     margin: 20px;

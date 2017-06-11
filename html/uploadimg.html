@@ -12,6 +12,13 @@
     <meta name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
     <link rel="stylesheet" type="text/css" href="../css/uploadimg.css"/>
+    <script src="../js/Tools.js"></script>
+    <script src="../js/Api.js"></script>
+    <link rel="stylesheet" href="../js/component/loading.css">
+    <script src="../js/component/loading.js"></script>
+    <link rel="stylesheet" href="../js/component/dialog.css">
+    <script src="../js/component/dialog.js"></script>
+    <script src="../js/lib/compress.js"></script>
 
 </head>
 <body>
@@ -24,41 +31,187 @@
             return {
                 imgs: [
                     {img: '../src/upload_face.png', title: '信息所在面'},
-                    {img: '../src/upload_back.png', title: '信息所在面'},
-                    {img: '../src/upload_face1.png', title: '信息所在面'},
-                    {img: '../src/upload_bank.png', title: '信息所在面'},
-                ]
+                    {img: '../src/upload_back.png', title: '国徽所在面'},
+                    {img: '../src/upload_face1.png', title: '手持身份证照片'},
+                    {img: '../src/upload_bank.png', title: '收款银行卡照片'},
+                ],
+                disabled: true
             }
         },
         componentDidMount: function () {
+            this.mercid = getQueryString("mercid");
+            if (this.mercid == null) {
+                this.mercid = "M00000290000000";
+            }
+            console.log(getQueryString("mercid"))
+            this.forntIdentity = "";
+            this.backIdentity = "";
+            this.handIdentity = "";
+            this.bankCard = "";
 
         },
+        uploadImg: function (index, result) {
+            var path = "";
+            var formData = new FormData();
+            let self = this;
+            var data = convertBase64UrlToBlob(result.replace("data:" + 'image/png' + ";base64,", ''));
+            switch (index) {
+                case 0:
+
+                    path = "/fileservice/uploadForntIdentity";
+                    formData.append("forntIdentity", convertBase64UrlToBlob(result), "forntIdentity.png");
+                    break
+                case 1:
+                    path = "/fileservice/uploadBackIdentity";
+                    formData.append("backIdentity", data, "backIdentity.png");
+                    break
+                case 2:
+                    path = "/fileservice/uploadHandIdentity";
+                    formData.append("handIdentity", data, "handIdentity.png");
+                    break
+                case 3:
+                    path = "/fileservice/uploadBankCard";
+                    formData.append("bankCard", data, "bankCard.png");
+                    break
+                default:
+                    break
+
+            }
+            var imgs = this.state.imgs
+            lnv.pageloading();
+            $.ajax({
+                url: `${host}${path}`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    lnv.destroyloading()
+                    if (res.status === 1) {
+                        switch (index) {
+                            case 0:
+                                self.forntIdentity = res.data;
+                                break
+                            case 1:
+                                self.backIdentity = res.data;
+                                break
+                            case 2:
+                                self.handIdentity = res.data;
+                                break
+                            case 3:
+                                self.bankCard = res.data;
+                                break
+                        }
+                        imgs[index].img = result;
+                        self.setState({
+                            imgs: imgs,
+                            disabled: (self.forntIdentity.length == 0 || self.backIdentity == 0 || self.handIdentity == 0 || self.bankCard == 0)
+                        })
+                    } else {
+                        lnv.alert({
+                            title: '提示',
+                            content: res.msg,
+                            alertBtnText: '确定',
+                        })
+                    }
+                },
+                error: function (e) {
+                    lnv.destroyloading()
+                    lnv.alert({
+                        title: '提示',
+                        content: '上传失败',
+                        alertBtnText: '确定',
+                    })
+                }
+            });
+
+        },
+        uploadRealNamePic: function () {
+            if (this.mercid == null) {
+                lnv.alert({
+                    title: '提示',
+                    content: '请先登录或者注册后再来吧！',
+                    alertBtnText: '确定',
+                })
+                return
+            }
+            lnv.pageloading()
+            var formData = new FormData();
+            formData.append("mercid",this.mercid);
+            formData.append("forntIdentity",this.forntIdentity);
+            formData.append("backIdentity",this.backIdentity);
+            formData.append("handIdentity",this.handIdentity);
+            formData.append("bankCard",this.bankCard);
+            $.ajax({
+                url: `${host}/fileservice/uploadRealNamePic`,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (res) {
+                    lnv.destroyloading()
+                    if (res.status === 1) {
+                        window.location.href = `infoauthentication.html?mercid=${res.data}`;
+                    } else {
+                        lnv.alert({
+                            title: '提示',
+                            content: res.msg,
+                            alertBtnText: '确定',
+                        })
+                    }
+                },
+                error: function (e) {
+                    lnv.destroyloading()
+                    lnv.alert({
+                        title: '提示',
+                        content: '上传失败',
+                        alertBtnText: '确定',
+                    })
+                }
+            });
+        }
+        ,
         handleClickImg: function (index, obj) {
-            console.log(obj.target.result)
+            let self = this;
             for (var i = 0, numFiles = obj.target.files.length; i < numFiles; i++) {
                 var file = obj.target.files[i];
                 var img = document.createElement('img');
                 var reader = new FileReader();
-                reader.onload = this.getOnloadFunc(img,index);
+                reader.onload = this.getOnloadFunc(img, index);
+                let imgSize = file.size;
                 reader.readAsDataURL(file);
+
             }
 
         },
-        getOnloadFunc:function (aImg,index) {
+        getOnloadFunc: function (aImg, index) {
             let self = this;
-            var imgs = this.state.imgs
-            return function(evt) {
-                console.log(evt.target.result,self);
-                imgs[index].img = evt.target.result;
-                self.setState({
-                    imgs:imgs
-                })
-                aImg.src = evt.target.result;
+            return function (evt) {
+                var image = new Image();
+                image.onload = function () {
+                    var cvs = document.createElement('canvas');
+                    var scale = 1;
+                    let fileType = 'image/png';
+                    if (this.width > 500 || this.height > 500) {  //1000只是示例，可以根据具体的要求去设定
+                        if (this.width > this.height) {
+                            scale = 500 / this.width;
+                        } else {
+                            scale = 500 / this.height;
+                        }
+                    }
+                    cvs.width = this.width * scale;
+                    cvs.height = this.height * scale;     //计算等比缩小后图片宽高
+                    var ctx = cvs.getContext('2d');
+                    ctx.drawImage(this, 0, 0, cvs.width, cvs.height);
+                    var newImageData = cvs.toDataURL(fileType, 0.8);   //重新生成图片，
+                    self.uploadImg(index, newImageData);
+                }
+                image.src = evt.target.result;
             };
         },
         render: function () {
             let self = this;
-            let {imgs} = this.state;
+            let {imgs, disabled} = this.state;
             return (<div>
                 <div className="imgs_div">
                     {
@@ -70,14 +223,15 @@
                             }} width="150px" height="120px">
                                 <img src="../src/upload_add.png"/>
                                 <p>{value.title}</p>
-                                <input className={`file${index}`} ref={`file${index}`} type="file" accept="image/*"
-                                       onChange={self.handleClickImg.bind(self,index)}/>
+                                <input className={`file${index}`} id={`file${index}`} ref={`file${index}`} type="file"
+                                       accept="image/*"
+                                       onChange={self.handleClickImg.bind(self, index)}/>
 
                             </div>)
                         })
                     }
                 </div>
-                <button className="upload_but" disabled = {true}>上传</button>
+                <button className="upload_but" onClick={this.uploadRealNamePic.bind(this)} disabled={disabled}>上传</button>
             </div>);
         }
     })
