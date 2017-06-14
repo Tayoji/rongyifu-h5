@@ -115,7 +115,7 @@
             if (!checkMobile(this.user)){
                 lnv.alert({
                     title: '提示',
-                    content: '手机号格式错误',
+                    content: '请输入正确的手机号',
                     alertBtnText: '确定',
                 })
                 return
@@ -138,11 +138,13 @@
             }
 
             lnv.pageloading()
+            let self = this;
+
             POST(`${host}/userservice/register`,{phonenumber:this.user,password:this.pwd,authCode:this.code},function (data) {
                 lnv.destroyloading()
                 if (data.status == 200){
                     console.log("sssss",data)
-                    window.location.href = `realname.html?mercid=${data.data}`
+                    window.location.href = `html/realname.html?mercid=${data.data}&user=${self.user}`
                 }else{
                     console.log("DDDD",data)
 

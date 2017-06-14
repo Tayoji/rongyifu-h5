@@ -132,43 +132,72 @@
                     title: '提示',
                     content: '请先登录或者注册后再来吧！',
                     alertBtnText: '确定',
+                    alertHandler:function () {
+                        window.location.href = "html/reg.html";
+                    }
                 })
                 return
             }
             lnv.pageloading()
-            var formData = new FormData();
-            formData.append("mercid",this.mercid);
-            formData.append("forntIdentity",this.forntIdentity);
-            formData.append("backIdentity",this.backIdentity);
-            formData.append("handIdentity",this.handIdentity);
-            formData.append("bankCard",this.bankCard);
-            $.ajax({
-                url: `${host}/fileservice/uploadRealNamePic`,
-                type: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (res) {
-                    lnv.destroyloading()
-                    if (res.status === 1) {
-                        window.location.href = `infoauthentication.html?mercid=${res.data}`;
-                    } else {
-                        lnv.alert({
-                            title: '提示',
-                            content: res.msg,
-                            alertBtnText: '确定',
-                        })
-                    }
-                },
-                error: function (e) {
-                    lnv.destroyloading()
+            POST(`${host}/fileservice/uploadRealNamePic`, {
+                mercid: this.mercid,
+                forntIdentity: this.forntIdentity,
+                backIdentity: this.backIdentity,
+                handIdentity: this.handIdentity,
+                bankCard: this.bankCard
+            }, function (res) {
+                lnv.destroyloading()
+                if (res.status === 1) {
+                    window.location.href = `html/infoauthentication.html?mercid=${res.data}`;
+                } else {
                     lnv.alert({
                         title: '提示',
-                        content: '上传失败',
+                        content: res.msg,
                         alertBtnText: '确定',
                     })
                 }
-            });
+            }, function (e) {
+                lnv.destroyloading()
+                lnv.alert({
+                    title: '提示',
+                    content: '上传失败',
+                    alertBtnText: '确定',
+                })
+            })
+//            var formData = new FormData();
+//            formData.append("mercid", this.mercid);
+//            formData.append("forntIdentity", this.forntIdentity);
+//            formData.append("backIdentity", this.backIdentity);
+//            formData.append("handIdentity", this.handIdentity);
+//            formData.append("bankCard", this.bankCard);
+//
+//            $.ajax({
+//                url: `${host}/fileservice/uploadRealNamePic`,
+//                type: 'POST',
+//                data: formData,
+//                processData: false,
+//                contentType: false,
+//                success: function (res) {
+//                    lnv.destroyloading()
+//                    if (res.status === 1) {
+//                        window.location.href = `infoauthentication.html?mercid=${res.data}`;
+//                    } else {
+//                        lnv.alert({
+//                            title: '提示',
+//                            content: res.msg,
+//                            alertBtnText: '确定',
+//                        })
+//                    }
+//                },
+//                error: function (e) {
+//                    lnv.destroyloading()
+//                    lnv.alert({
+//                        title: '提示',
+//                        content: '上传失败',
+//                        alertBtnText: '确定',
+//                    })
+//                }
+//            });
         }
         ,
         handleClickImg: function (index, obj) {
@@ -231,7 +260,8 @@
                         })
                     }
                 </div>
-                <button className="upload_but" onClick={this.uploadRealNamePic.bind(this)} disabled={disabled}>上传</button>
+                <button className="upload_but" onClick={this.uploadRealNamePic.bind(this)} disabled={disabled}>上传
+                </button>
             </div>);
         }
     })

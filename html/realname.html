@@ -60,9 +60,7 @@
             this.bankcode = null;
             let self = this;
             this.mercid = getQueryString("mercid");
-            if (this.mercid == null) {
-                this.mercid = "M00000290000000";
-            }
+
             console.log(getQueryString("mercid"))
 
             $("#input6").cityPicker({
@@ -252,6 +250,9 @@
                     title: '提示',
                     content: '请先登录或者注册后再来吧！',
                     alertBtnText: '确定',
+                    alertHandler:function () {
+                        window.location.href = "html/reg.html";
+                    }
                 })
                 return
             }
@@ -327,7 +328,7 @@
                         content: res.msg,
                         alertBtnText: '确定',
                     })
-                    window.location.href = `uploadimg.html?mercid=${res.data}`
+                    window.location.href = `html/uploadimg.html?mercid=${res.data}`
                 }else {
                     lnv.alert({
                         title: '提示',
@@ -344,11 +345,15 @@
         },
         render: function () {
             let self = this;
+            let user = getQueryString("user");
+            console.log("id",getQueryString("mercid"));
+            console.log("user",user);
+
             return (
                     <div>
                         <div className="alert_div">
                             <p>友情提示：只有通过实名认证才能有效收款使用</p>
-                            <p>{`当前账户：${1832825255}`}</p>
+                            <p >{`当前账户：${user}`}</p>
                         </div>
                         <div className="inputs">
                             {
@@ -361,13 +366,11 @@
                                                 <input ref={value.ref}
                                                        readOnly={index >= 5 && index <= 7 ? true : false}
                                                        placeholder={value.pl} id={`input${index }`} type={function () {
-                                                    if (index == 1) {
+                                                    if (index == 1 || index == 2 || (index >= 5 && index <= 7)) {
                                                         return 'text';
                                                     } else if (index == 3) {
                                                         return 'number';
-                                                    } else if (index >= 5 && index <= 7) {
-                                                        return 'text';
-                                                    } else {
+                                                   } else {
                                                         return 'tel';
                                                     }
                                                 }()} onClick={self.handleClick.bind(self, index)}

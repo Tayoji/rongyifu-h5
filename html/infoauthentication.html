@@ -37,9 +37,7 @@
         },
         componentDidMount: function () {
             this.mercid = getQueryString("mercid");
-            if (this.mercid == null) {
-                this.mercid = "M00000290000000";
-            }
+
             console.log(getQueryString("mercid"));
 
             this.businessLicense = null;
@@ -166,6 +164,9 @@
                     title: '提示',
                     content: '请先登录或者注册后再来吧！',
                     alertBtnText: '确定',
+                    alertHandler:function () {
+                        window.location.href = "html/reg.html";
+                    }
                 })
                 return
             }
