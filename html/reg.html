@@ -52,6 +52,14 @@
             this.user = "";
             this.pwd = "";
             this.code = "";
+            let innerWidth = window.innerWidth;
+            let innerHeight = window.innerHeight;
+            let headerHeight = innerWidth * (354.0/750.0);
+            let top = innerHeight - headerHeight - 55*3 - 20 - 100;
+            console.log("top",top);
+            $(".regbut").css('margin-top',top);
+
+
         },
         handleTextChange: function (index, e) {
             switch (index) {
@@ -173,7 +181,7 @@
                     <img className="back" src="../src/reg_di.png"/>
                     <img className="img" src="../src/reg_header.png"/>
                 </div>
-                <div>
+                <div className="inputs">
                     {
                         inputs.map(function (value, index) {
                             return (<div className="input">

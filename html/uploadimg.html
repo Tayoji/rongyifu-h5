@@ -39,6 +39,7 @@
             }
         },
         componentDidMount: function () {
+            let str = ""
             this.mercid = getQueryString("mercid");
             if (this.mercid == null) {
                 this.mercid = "M00000290000000";
@@ -52,60 +53,74 @@
         },
         uploadImg: function (index, result) {
             var path = "";
-            var formData = new FormData();
+            var formData ;
             let self = this;
-            var data = convertBase64UrlToBlob(result.replace("data:" + 'image/png' + ";base64,", ''));
+            // convertBase64UrlToBlob(result.replace("data:" + 'image/png' + ";base64,", ''));
+            var data = result.replace("data:" + 'image/png' + ";base64,", '');
             switch (index) {
                 case 0:
 
                     path = "/fileservice/uploadForntIdentity";
-                    formData.append("forntIdentity", convertBase64UrlToBlob(result), "forntIdentity.png");
+                    formData = {forntIdentity:data}
+//                    formData.append("forntIdentity", data, "forntIdentity.png");
                     break
                 case 1:
                     path = "/fileservice/uploadBackIdentity";
-                    formData.append("backIdentity", data, "backIdentity.png");
+                    formData = {backIdentity:data}
+//                    formData.append("backIdentity", data, "backIdentity.png");
                     break
                 case 2:
                     path = "/fileservice/uploadHandIdentity";
-                    formData.append("handIdentity", data, "handIdentity.png");
+                    formData = {handIdentity:data}
+//                    formData.append("handIdentity", data, "handIdentity.png");
                     break
                 case 3:
                     path = "/fileservice/uploadBankCard";
-                    formData.append("bankCard", data, "bankCard.png");
+                    formData = {bankCard:data}
+//                    formData.append("bankCard", data, "bankCard.png");
                     break
                 default:
                     break
 
             }
             var imgs = this.state.imgs
+
+            imgs[index].img = result;
+            self.setState({
+                imgs: imgs,
+                disabled: (self.forntIdentity.length == 0 || self.backIdentity.length == 0 || self.handIdentity.length == 0 || self.bankCard.length == 0)
+            })
+            var imgs = this.state.imgs
             lnv.pageloading();
             $.ajax({
                 url: `${host}${path}`,
                 type: 'POST',
-                data: formData,
+                data: JSON.stringify(formData),
                 processData: false,
                 contentType: false,
                 success: function (res) {
                     lnv.destroyloading()
-                    if (res.status === 1) {
+                    let jsonObj = JSON.parse(res);
+                    console.log(jsonObj);
+                    if (jsonObj.status === 1) {
                         switch (index) {
                             case 0:
-                                self.forntIdentity = res.data;
+                                self.forntIdentity = jsonObj.data;
                                 break
                             case 1:
-                                self.backIdentity = res.data;
+                                self.backIdentity = jsonObj.data;
                                 break
                             case 2:
-                                self.handIdentity = res.data;
+                                self.handIdentity = jsonObj.data;
                                 break
                             case 3:
-                                self.bankCard = res.data;
+                                self.bankCard = jsonObj.data;
                                 break
                         }
                         imgs[index].img = result;
                         self.setState({
                             imgs: imgs,
-                            disabled: (self.forntIdentity.length == 0 || self.backIdentity == 0 || self.handIdentity == 0 || self.bankCard == 0)
+                            disabled: (self.forntIdentity.length == 0 || self.backIdentity.length == 0 || self.handIdentity.length == 0 || self.bankCard.length == 0)
                         })
                     } else {
                         lnv.alert({
@@ -164,40 +179,6 @@
                     alertBtnText: '确定',
                 })
             })
-//            var formData = new FormData();
-//            formData.append("mercid", this.mercid);
-//            formData.append("forntIdentity", this.forntIdentity);
-//            formData.append("backIdentity", this.backIdentity);
-//            formData.append("handIdentity", this.handIdentity);
-//            formData.append("bankCard", this.bankCard);
-//
-//            $.ajax({
-//                url: `${host}/fileservice/uploadRealNamePic`,
-//                type: 'POST',
-//                data: formData,
-//                processData: false,
-//                contentType: false,
-//                success: function (res) {
-//                    lnv.destroyloading()
-//                    if (res.status === 1) {
-//                        window.location.href = `infoauthentication.html?mercid=${res.data}`;
-//                    } else {
-//                        lnv.alert({
-//                            title: '提示',
-//                            content: res.msg,
-//                            alertBtnText: '确定',
-//                        })
-//                    }
-//                },
-//                error: function (e) {
-//                    lnv.destroyloading()
-//                    lnv.alert({
-//                        title: '提示',
-//                        content: '上传失败',
-//                        alertBtnText: '确定',
-//                    })
-//                }
-//            });
         }
         ,
         handleClickImg: function (index, obj) {
@@ -255,7 +236,6 @@
                                 <input className={`file${index}`} id={`file${index}`} ref={`file${index}`} type="file"
                                        accept="image/*"
                                        onChange={self.handleClickImg.bind(self, index)}/>
-
                             </div>)
                         })
                     }

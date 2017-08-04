@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="../css/promotionreg.css"/>
+    <title>注册</title>
+</head>
+<body>
+    <img class="backImg" src="../src/backimage.png">
+    <div class="container">
+       <div class="inputBox">
+           <input class="" placeholder="请输入手机号码"/>
+       </div>
+        <div class="inputBox" id="codeDiv">
+            <input id="codeInput" placeholder="请输入验证码"/>
+            <button id="codeBut">获取验证码</button>
+        </div>
+        <div class="inputBox">
+            <input  placeholder="请输入登录密码"/>
+        </div>
+        <button class="reg" >注册瓜分50元现金</button>
+        <p class="info">奖金系统自动秒结算 可立即提现</p>
+        <div class="inputBox">
+            <input placeholder="推荐人手机号(推荐人奖励50元现金)"/>
+        </div>
+        <div class="bottoms">
+            <a href="http://www.baidu.com">奖励规则</a>
+            <a href="http://www.baidu.com">下载容易付APP</a>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function changeContainerMarginTop() {
+            var top = (window.innerWidth/375*270) + 'px';
+            document.getElementsByClassName('container')[0].style.marginTop = top;
+        }
+        changeContainerMarginTop()
+    </script>
+</body>
+</html>

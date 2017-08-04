@@ -1,12 +1,17 @@
 
+
 * {
     margin: 0px;
     padding: 0px;
 }
-
+.backimage{
+    width: 100%;
+    height:auto;
+}
 .header > .back {
     width: 100%;
     max-height: 354px;
+    position: absolute;
 
 }
 
@@ -18,9 +23,7 @@
 }
 
 .regbut {
-    position: absolute;
     width: calc(100% - 40px);
-    bottom: 50px;
     margin: 20px;
     background-color: #1e94d4;
     height: 40px;
