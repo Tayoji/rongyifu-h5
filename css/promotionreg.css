@@ -34,8 +34,8 @@ body{
 }
 .inputBox{
     background-color: white;
-    height: 44px;
-    margin: 5px;
+    height: 39px;
+    margin:6px 8px;
     border-radius: 3px;
     overflow: hidden;
 }
@@ -72,6 +72,7 @@ input{
 .reg{
     border: none;
     background-color: transparent;
+    margin-top: 10px;
 }
 .reg > *{
     width: 235px;
