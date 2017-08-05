@@ -47,6 +47,9 @@ input{
     padding-left: 8px;
     padding-right: 8px;
 }
+input:disabled{
+    color: black;
+}
 #codeDiv{
     display: flex;
     justify-content: space-between;
