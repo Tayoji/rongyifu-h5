@@ -71,6 +71,7 @@ input{
 }
 .reg{
     border: none;
+    background-color: transparent;
 }
 .reg > *{
     width: 235px;
