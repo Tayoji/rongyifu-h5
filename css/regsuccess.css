@@ -1,0 +1,17 @@
+* {
+    margin: 0px;
+    padding: 0px;
+}
+body{
+    background-color: rgb(251,228,184);
+    background: url('../src/rs-backimage.png') no-repeat fixed;
+    background-size: 100% 100%;
+
+}
+.container{
+
+}
+img{
+    width: calc(100% - 60px);
+    margin: 3px 30px;
+}

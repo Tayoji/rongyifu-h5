@@ -4,19 +4,33 @@
 }
 body{
     background-color: rgb(251,228,184);
+    background: url('../src/backimage.png') no-repeat fixed;
+    background-size: 100% 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
-.backImg{
+.rule{
     width: 100%;
-    height: auto;
-    position: absolute;
+    margin-top: 78px;
+
+}
+.rule img{
+    width: 50px;
+    float: right;
 }
 .container{
-    position: absolute;
-    margin-top: 270px;
-    margin-left: 40px;
-    height:auto;
-    width: calc(100% - 80px);
-
+    /*position: absolute;*/
+    height:477px;
+    width: 300px;
+    background: url('../src/envelope.png') no-repeat;
+    background-size: 100% 100%;
+    overflow: hidden;
+}
+.content{
+    margin-top: 165px;
+    display: flex;
+    flex-direction: column;
 }
 .inputBox{
     background-color: white;
@@ -55,18 +69,13 @@ input{
 
 
 }
-
 .reg{
-    margin: 10px 30px;
-    height: 40px;
-    width: calc(100% - 60px);
-    border-radius: 20px;
-    background-color: rgb(255,160,64);
     border: none;
-    box-shadow: 5px 5px 5px 1px rgba(0,0,0,0.3) ;
-    font-weight: bold;
-    font-size: 18px;
-    color: red;
+}
+.reg > *{
+    width: 235px;
+    height: auto;
+
 }
 .info{
     color: white;
