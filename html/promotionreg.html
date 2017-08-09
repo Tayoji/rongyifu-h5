@@ -5,37 +5,76 @@
     <meta name="viewport"
           content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
     <link rel="stylesheet" type="text/css" href="../css/promotionreg.css"/>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+    <script src="/js/component/gVerify.js"></script>
+    <script>
+
+        function onload() {
+            var verifyCode = new GVerify("v_container");
+            document.getElementsByClassName('imageCodeDiv')[0].style.zIndex = -1;
+            document.getElementById("code_submit").onclick = function () {
+                var res = verifyCode.validate(document.getElementById("image_code_input").value);
+                if (res) {
+                    document.getElementsByClassName('imageCodeDiv')[0].style.zIndex = -1;
+                    alert("验证正确");
+                } else {
+                    alert("验证码错误");
+
+                }
+            }
+            document.getElementById("code_cannel").onclick = function () {
+                document.getElementsByClassName('imageCodeDiv')[0].style.zIndex = -1
+            }
+        }
+        function vcodeclick() {
+            document.getElementsByClassName('imageCodeDiv')[0].style.zIndex = 999
+
+        }
+
+
+    </script>
     <title>注册</title>
 </head>
-<body>
-    <img class="backImg" src="../src/backimage.png">
-    <div class="container">
-       <div class="inputBox">
-           <input class="" placeholder="请输入手机号码"/>
-       </div>
+<body onload="onload()">
+<div class="rule">
+    <a href="./recommend.html">
+        <img src="../src/rule.png">
+    </a>
+</div>
+<input type="hidden" id="INVITEMOBILE" name="INVITEMOBILE" value="2E925725C7C64B99"/>
+<div class="container">
+    <div class="content">
+        <div class="inputBox">
+            <input class="" placeholder="请输入手机号码" type="number" id="MERPHONENUMBER"/>
+        </div>
         <div class="inputBox" id="codeDiv">
-            <input id="codeInput" placeholder="请输入验证码"/>
-            <button id="codeBut">获取验证码</button>
+            <input placeholder="请输入验证码" type="number" id="VCODE"/>
+            <button onclick="vcodeclick()" id="btn">发送验证码</button>
         </div>
         <div class="inputBox">
-            <input  placeholder="请输入登录密码"/>
+            <input placeholder="请输入登录密码" type="password" id="PASSWD"/>
         </div>
-        <button class="reg" >注册瓜分50元现金</button>
+        <button class="reg">
+            <img src="../src/regbut.png" onclick="applyUser()">
+        </button>
         <p class="info">奖金系统自动秒结算 可立即提现</p>
         <div class="inputBox">
-            <input placeholder="推荐人手机号(推荐人奖励50元现金)"/>
+            <input placeholder="推荐人手机号(推荐人奖励50元现金)" value="全民推广商： 陈*俊 17688885229" readonly/>
         </div>
-        <div class="bottoms">
-            <a href="http://www.baidu.com">奖励规则</a>
-            <a href="http://www.baidu.com">下载容易付APP</a>
+
+    </div>
+</div>
+<div class="imageCodeDiv">
+    <div class="imageCodeContent">
+        <p>请输入下面验证码</p>
+        <div id="v_container"></div>
+        <input id="image_code_input" type="url"/>
+        <div>
+            <button id="code_cannel" >取消</button>
+            <button id="code_submit">提交</button>
         </div>
     </div>
-    <script type="text/javascript">
-        function changeContainerMarginTop() {
-            var top = (window.innerWidth/375*270) + 'px';
-            document.getElementsByClassName('container')[0].style.marginTop = top;
-        }
-        changeContainerMarginTop()
-    </script>
+</div>
 </body>
+
 </html>
