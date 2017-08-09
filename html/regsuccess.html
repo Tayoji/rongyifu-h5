@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <title>容易付-聚合收款App</title>
+    <link rel="stylesheet" type="text/css" href="../css/regsuccess.css"/>
+</head>
+<body>
+<div class="container">
+    <a id="a1">
+        <img id="img1" src="../src/android-download.png">
+    </a>
+    <a  id="a2">
+        <img id="img2" src="../src/ios-download.png">
+    </a>
+</div>
+<script type="text/javascript">
+    function changeContainerMarginTop() {
+        var top = (window.innerWidth / 375 * 360) + 'px';
+        document.getElementsByClassName('container')[0].style.marginTop = top;
+    }
+
+    function changePosition() {
+        var u = navigator.userAgent;
+        var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1; //android终端
+        var isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+        let androidImg = "../src/android-download.png";
+        let iosImg = "../src/ios-download.png";
+        let iosUrl = 'http://www.baidu.com';
+        let androidUrl = "http://www.baidu.com";
+        if (isAndroid){
+            document.getElementById('a1').href = androidUrl;
+            document.getElementById('img1').src = androidImg;
+
+            document.getElementById('a2').href = iosUrl;
+            document.getElementById('img2').src = iosImg;
+        }
+        if(isiOS){
+            document.getElementById('a1').href = iosUrl;
+            document.getElementById('img1').src = iosImg;
+
+            document.getElementById('a2').href = androidUrl;
+            document.getElementById('img2').src = androidImg;
+        }
+    }
+    changeContainerMarginTop()
+    changePosition()
+</script>
+</body>
+</html>
