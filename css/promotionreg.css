@@ -106,7 +106,6 @@ input:disabled{
 }
 
 .imageCodeDiv{
-    z-index: 999;
     position: absolute;
     width: 100%;
     height: 100%;

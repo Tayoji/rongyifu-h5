@@ -11,11 +11,11 @@
 
         function onload() {
             var verifyCode = new GVerify("v_container");
-            document.getElementsByClassName('imageCodeDiv')[0].style.zIndex = -1;
+            $(".imageCodeDiv").hide();
             document.getElementById("code_submit").onclick = function () {
                 var res = verifyCode.validate(document.getElementById("image_code_input").value);
                 if (res) {
-                    document.getElementsByClassName('imageCodeDiv')[0].style.zIndex = -1;
+                    $(".imageCodeDiv").hide();
                     alert("验证正确");
                 } else {
                     alert("验证码错误");
@@ -23,12 +23,11 @@
                 }
             }
             document.getElementById("code_cannel").onclick = function () {
-                document.getElementsByClassName('imageCodeDiv')[0].style.zIndex = -1
+                $(".imageCodeDiv").hide();
             }
         }
         function vcodeclick() {
-            document.getElementsByClassName('imageCodeDiv')[0].style.zIndex = 999
-
+            $(".imageCodeDiv").show();
         }
 
 
