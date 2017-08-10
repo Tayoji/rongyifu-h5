@@ -24,6 +24,7 @@ body{
 }
 .container{
     /*position: absolute;*/
+    margin-top: 27px;
     height:485px;
     width: 310px;
     background: url('../src/envelope.png') no-repeat;

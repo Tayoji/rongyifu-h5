@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+	<meta name="viewport"
+		  content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+	<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+	<title>立即下载容易付APP</title>
+<style>
+html, body {
+	margin: 0;
+	padding: 0;
+}
+
+.wapbox {
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+.wapbox img {
+	width: 100%;
+	height: auto;
+}
+
+.andbtn, .iosbtn {
+	width: 176px;
+	height: 30px;
+	display: block;
+	margin: 10px auto;
+	text-indent: -222em;
+	background: url('../src/android.png') no-repeat;
+	background-size: 100% 100%;
+}
+
+.iosbtn {
+	background: url(../src/ios.png) no-repeat;
+	background-size: 100% 100%;
+}
+
+a.andbtn:hover {
+	background: url(../src/android_a.png) no-repeat;
+}
+
+a.iosbtn:hover {
+	background: url(../src/ios_a.png) no-repeat;
+}
+
+.copyright {
+	text-align: center;
+	background: #b5b9bc;
+	color: #fff;
+	height: 55px;
+	line-height: 55px;
+	font-size: 1.2em;
+	margin-top: 15px;
+}
+.imageCodeDiv{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	top: 0px;
+	background-color: rgba(0,0,0,0.3);
+	display: -webkit-flex;
+	display: flex;
+	-webkit-justify-content: center;
+	justify-content: center;
+	-webkit-align-items: center;
+	align-items: center;
+}
+.imageCodeContent{
+	width: 75%;
+	background-color: white;
+	border-radius: 5px;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-direction: column;
+	flex-direction: column;
+	-webkit-justify-content: center;
+	justify-content: center;
+	-webkit-align-items: center;
+	align-items: center;
+}
+.imageCodeContent > p {
+
+	margin: 8px;
+	color: #333;
+}
+.imageCodeContent button{
+	margin-top: 8px;
+	margin-bottom: 8px;
+	margin-right: 10px;
+	margin-left: 10px;
+	height: 30px;
+	width: 80px;
+	font-size: 14px;
+	color: #333;
+
+}
+#image_code_input{
+	width: 80%;
+	height: 38px;
+	border: 1px solid #acb5bc;
+	border-radius: 5px;
+	text-align: center;
+	font-size: 15px;
+}
+#v_container{
+	width: 100px;
+	height: 40px;
+	margin-bottom: 8px;
+}
+</style>
+	<script src="/js/component/gVerify.js"></script>
+</head>
+
+
+<body onload="onload()">
+	<div class="wapbox">
+
+		<img src="../src/imob.png" id="imgInit">
+		<!--https://itunes.apple.com/cn/app/jie-zou-da-shi/id1118292531?mt=8-->
+		<div>
+			<a onclick="ajaxTj()"
+				href="javascript:volid(0);"
+				class="iosbtn">下载IOS版本</a>
+		</div>
+
+		<div>
+			<a onclick="ajaxTj()"
+				href="javascript:volid(0);"
+				class="andbtn">下载安卓版本</a>
+		</div>
+
+		<div class="copyright">Copyright @ 2016 容易付</div>
+	</div>
+	<div class="imageCodeDiv">
+		<div class="imageCodeContent">
+			<p>请输入下面验证码</p>
+			<div id="v_container"></div>
+			<input id="image_code_input" type="url"/>
+			<div>
+				<button id="code_cannel" >取消</button>
+				<button id="code_submit">提交</button>
+			</div>
+		</div>
+	</div>
+</body>
+<script type="text/javascript">
+    var verifyCode
+    function onload() {
+        $(".imageCodeDiv").hide();
+        verifyCode = new GVerify("v_container");
+        document.getElementById("code_submit").onclick = function () {
+            var res = verifyCode.validate(document.getElementById("image_code_input").value);
+            if (res) {
+                $(".imageCodeDiv").hide();
+            } else {
+
+            }
+        }
+        document.getElementById("code_cannel").onclick = function () {
+            $(".imageCodeDiv").hide();
+        }
+    }
+//    function vcodeclick() {
+//        $(".imageCodeDiv").show();
+//    }
+
+    function ajaxTj() {
+		var browser = {
+			versions : function() {
+				var u = navigator.userAgent, app = navigator.appVersion;
+				return {
+					trident : u.indexOf('Trident') > -1,
+					presto : u.indexOf('Presto') > -1,
+					webKit : u.indexOf('AppleWebKit') > -1,
+					gecko : u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1,
+					mobile : !!u.match(/AppleWebKit.*Mobile.*/)
+							|| !!u.match(/AppleWebKit/),
+					ios : !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),
+					android : u.indexOf('Android') > -1
+							|| u.indexOf('Linux') > -1,
+					iPhone : u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1,
+					iPad : u.indexOf('iPad') > -1,
+					webApp : u.indexOf('Safari') == -1
+				};
+			}()
+		}
+
+		if (is_weixin()) {
+			document.getElementById('imgInit').src = "images/weixin.png";
+		}
+		else {
+			if (browser.versions.ios || browser.versions.iPhone
+					|| browser.versions.iPad || browser.versions.webApp) {
+				window.location = "https://itunes.apple.com/cn/app/jie-zou-da-shi/id1118292531?mt=8";
+			} else {
+				window.location = "http://posappnew.oss-cn-hangzhou.aliyuncs.com/ryf/app-ryfms-release-5.2.3.1.apk";
+			}
+		}
+
+	}
+	
+	function is_weixin(){
+        var ua = navigator.userAgent.toLowerCase();
+        if(ua.match(/MicroMessenger/i)=="micromessenger") {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>
+</html>
+
+        
