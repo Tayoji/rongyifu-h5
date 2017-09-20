@@ -1,0 +1,120 @@
+*{
+    margin: 0px;
+    padding: 0px;
+}
+body{
+    background-color: #f1f0f7;
+}
+div{
+    background-color: white;
+}
+.title_div{
+    width: 100%;
+    height: 50px;
+    display: flex;
+    display: -webkit-flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+}
+.left,.right{
+    width: 88px;
+    font-size: 14px;
+    color: #b4bcc4;
+    margin: 10px;
+}
+.title{
+    color: #b4bcc4;
+    font-size: 16px;
+}
+
+.bank_div{
+    height: 80px;
+    margin-top: 10px;
+    display: flex;
+    display: -webkit-flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+}
+.bank_img{
+    width: 45px;
+    margin-left: 14px;
+    margin-right: 14px;
+}
+.bank_info{
+    flex-grow: 2;
+    -webkit-flex-grow: 2;
+}
+.bank_info > p{
+    color: #6c6e70;
+    margin: 4px auto;
+    font-size: 16px;
+}
+.card_id{
+   font-size: 14px;
+}
+.inputs_div{
+    margin-top: 10px;
+    display: flex;
+    display: -webkit-flex;
+    flex-direction: column;
+    -webkit-flex-direction: column;
+}
+.input_div{
+    display: flex;
+    display: -webkit-flex;
+    justify-content: space-between;
+    -webkit-justify-content: space-between;
+    align-items: center;
+    -webkit-align-items: center;
+    height: 44px;
+}
+.space_line{
+    height: 1px;
+    background-color: #f4f3f8;
+    width: 100%;
+
+}
+.inputs_div p {
+    color: #6c6e70;
+    font-size: 15px;
+    margin: 10px;
+    width: 50px;
+}
+.inputs_div input{
+    flex-grow: 2;
+    -webkit-flex-grow: 2;
+    color: #6c6e70;
+    font-size: 15px;
+    margin-right: 10px;
+    height: 40px;
+    line-height: 20px;
+    border: none;
+}
+.codebut{
+    border: none;
+    height: 30px;
+    border-radius: 3px;
+    background-color: #f18a00;
+    color: white;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-right: 10px;
+    font-size: 12px;
+}
+.codebut:disabled{
+    background-color: #acb5bc;
+}
+.next{
+    margin: 44px 10px;
+    width: calc(100% - 20px);
+    height: 44px;
+    border-radius: 3px;
+    border: none;
+    background-color: #30a0ff;
+    color: white;
+    font-size: 17px;
+}

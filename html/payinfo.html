@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>信息填写</title>
+    <script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.1.1/jquery.min.js"></script>
+
+    <meta name="viewport"
+          content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link rel="stylesheet" href="../css/payinfo.css">
+    <script type="text/javascript">
+
+        function reload() {
+            $('.codebut').click( function () {
+                var count = 60;
+                $('.codebut').attr("disabled",true);
+                var timer = setInterval(function () {
+                    count--;
+                    if (count <= 0){
+                        $('.codebut').text("获取验证码");
+                        $('.codebut').attr("disabled",false);
+                        clearInterval(timer);
+                    }else{
+                        $('.codebut').text(count + "s后重新获取");
+                    }
+
+                },1000)
+            })
+        }
+    </script>
+</head>
+<body onload="reload()">
+<div class="title_div">
+    <p class="left">中文</p>
+    <p class="title">订单支付</p>
+    <img class="right" src="../src/online.png"/>
+</div>
+<div class="bank_div">
+    <img class="bank_img" src="../src/zslogo.png"/>
+    <div class="bank_info">
+        <p class="name">招商银行</p>
+        <p class="card_id">信用卡|尾号6598</p>
+    </div>
+</div>
+<div class="inputs_div">
+    <div class="input_div">
+        <p>有效期</p>
+        <input type="month" placeholder="月份/年份"/>
+    </div>
+    <div class="space_line"></div>
+    <div class="input_div">
+        <p>CVV2</p>
+        <input type="number" placeholder="银行卡背面的三位数字"/>
+    </div>
+    <div class="space_line"></div>
+    <div class="input_div">
+        <p>验证码</p>
+        <input type="number" placeholder="请输入手机验证码 "/>
+        <button class="codebut">获取验证码</button>
+    </div>
+</div>
+<button class="next">支付88.88元</button>
+
+</body>
+</html>
